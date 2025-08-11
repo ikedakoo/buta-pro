@@ -9,19 +9,36 @@
   </header>
   
   <div class="system-content">
-    <div class="empty-state">
-      <div class="empty-icon">📋</div>
-      <h2>配送計画策定補助システム</h2>
-      <p>このシステムは現在開発中です。<br>配送ルートの最適化機能を提供予定です。</p>
-      <div class="features-preview">
-        <h3>予定機能</h3>
-        <ul>
-          <li>配送ルートの自動最適化</li>
-          <li>配送時間の予測</li>
-          <li>配送コストの計算</li>
-          <li>ドライバーのスケジュール管理</li>
-          <li>リアルタイム配送状況追跡</li>
-        </ul>
+    <div class="map-container">
+      <h2>関東エリア配送計画</h2>
+      <div class="map-wrapper">
+        <div id="map" class="leaflet-map"></div>
+      </div>
+      
+      <div class="legend">
+        <h3>エリア別配送ポイント</h3>
+        <div class="legend-items">
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: #4caf50;"></div>
+            <span>東京・千葉南部エリア (12ポイント)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: #2196f3;"></div>
+            <span>神奈川エリア (12ポイント)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: #ff9800;"></div>
+            <span>埼玉エリア (14ポイント)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: #9c27b0;"></div>
+            <span>千葉北部・茨城南部エリア (13ポイント)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: #f44336;"></div>
+            <span>群馬・栃木エリア (12ポイント)</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
