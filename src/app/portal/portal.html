@@ -1,0 +1,22 @@
+<div class="portal-container">
+  <header class="portal-header">
+    <div class="header-left">
+      <img src="BUTA-pro.png" alt="BUTA-PRO" class="header-logo">
+      <h1>BUTA-PRO システム ポータル</h1>
+    </div>
+    <button (click)="logout()" class="logout-btn">ログアウト</button>
+  </header>
+  
+  <div class="cards-container">
+    <div 
+      *ngFor="let system of systems; let i = index" 
+      class="card"
+      (click)="navigateToSystem(system.id)"
+      [class.left-column]="i % 2 === 0"
+      [class.right-column]="i % 2 === 1">
+      <div class="card-icon">{{ system.icon }}</div>
+      <h3>{{ system.name }}</h3>
+      <p>{{ system.description }}</p>
+    </div>
+  </div>
+</div>
