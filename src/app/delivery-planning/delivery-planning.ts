@@ -44,7 +44,8 @@ export class DeliveryPlanningComponent implements OnInit, AfterViewInit, OnDestr
 
     try {
       // 動的にLeafletをインポート
-      const L = await import('leaflet');
+      const leafletModule = await import('leaflet');
+      const L = leafletModule.default || leafletModule;
       
       // 関東地方の中心座標
       const kantoCenter: [number, number] = [35.6762, 139.6503];
@@ -61,6 +62,8 @@ export class DeliveryPlanningComponent implements OnInit, AfterViewInit, OnDestr
       this.addDeliveryPointsToMap(L);
     } catch (error) {
       console.error('地図の初期化に失敗しました:', error);
+      // フォールバック: 地図が表示できない場合のメッセージを表示
+      this.showMapError();
     }
   }
 
@@ -161,6 +164,33 @@ export class DeliveryPlanningComponent implements OnInit, AfterViewInit, OnDestr
         </div>
       `);
     });
+  }
+
+  private showMapError() {
+    const mapElement = document.getElementById('map');
+    if (mapElement) {
+      mapElement.innerHTML = `
+        <div style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          background: #2a2a2a;
+          color: #ffffff;
+          border-radius: 8px;
+          border: 2px solid #444;
+          flex-direction: column;
+          gap: 10px;
+        ">
+          <div style="font-size: 48px;">🗺️</div>
+          <div style="font-size: 18px; font-weight: bold;">地図を読み込み中...</div>
+          <div style="font-size: 14px; color: #cccccc;">
+            地図の表示に問題が発生しました。<br>
+            しばらくお待ちいただくか、ページを再読み込みしてください。
+          </div>
+        </div>
+      `;
+    }
   }
 
   backToPortal() {
