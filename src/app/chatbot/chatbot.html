@@ -1,0 +1,84 @@
+<div class="chatbot-container">
+  <header class="chatbot-header">
+    <button (click)="backToPortal()" class="back-btn">← ポータルに戻る</button>
+    <div class="header-center">
+      <img src="BUTA-pro.png" alt="BUTA-pro" class="header-logo">
+      <h1>Talk With BUTA</h1>
+    </div>
+    <button (click)="logout()" class="logout-btn">ログアウト</button>
+  </header>
+  
+  <div class="chat-content">
+    <div class="chat-messages" #messagesContainer>
+      <div 
+        *ngFor="let message of messages" 
+        class="message"
+        [class.user-message]="message.isUser"
+        [class.bot-message]="!message.isUser">
+        
+        <div class="message-avatar">
+          <span *ngIf="message.isUser">👤</span>
+          <img *ngIf="!message.isUser" src="BUTA-pro.png" alt="BUTA" class="bot-avatar-logo">
+        </div>
+        
+        <div class="message-content">
+          <div class="message-text">{{message.text}}</div>
+          <div class="message-time">
+            {{message.timestamp | date:'HH:mm'}}
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="isTyping" class="message bot-message typing-message">
+        <div class="message-avatar">
+          <img src="BUTA-pro.png" alt="BUTA" class="bot-avatar-logo">
+        </div>
+        <div class="message-content">
+          <div class="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="chat-input-container">
+      <div class="input-wrapper">
+        <textarea 
+          [(ngModel)]="currentMessage"
+          (keypress)="onKeyPress($event)"
+          placeholder="メッセージを入力してください..."
+          class="message-input"
+          rows="1"></textarea>
+        <button 
+          (click)="sendMessage()"
+          [disabled]="!currentMessage.trim() || isTyping"
+          class="send-btn">
+          📤
+        </button>
+      </div>
+      <div class="input-help">
+        <small>Enterで送信 | Shift+Enterで改行</small>
+      </div>
+    </div>
+  </div>
+  
+  <div class="chat-suggestions">
+    <h3>よくある質問</h3>
+    <div class="suggestion-buttons">
+      <button (click)="currentMessage = '配送計画の使い方を教えて'; sendMessage()" class="suggestion-btn">
+        配送計画の使い方
+      </button>
+      <button (click)="currentMessage = '在庫管理について'; sendMessage()" class="suggestion-btn">
+        在庫管理について
+      </button>
+      <button (click)="currentMessage = 'ドライバー割り振りの仕組み'; sendMessage()" class="suggestion-btn">
+        ドライバー割り振り
+      </button>
+      <button (click)="currentMessage = 'システムの機能一覧'; sendMessage()" class="suggestion-btn">
+        機能一覧
+      </button>
+    </div>
+  </div>
+</div>

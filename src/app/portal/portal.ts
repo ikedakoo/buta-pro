@@ -67,8 +67,13 @@ export class PortalComponent {
     if (systemId === 'delivery-planning') {
       this.router.navigate(['/delivery-planning']);
     } else {
-      alert(`${systemId} は現在開発中です。`);
+      // 他のシステムは未実装のため、アラートを表示
+      alert(`${systemId}システムは現在開発中です。`);
     }
+  }
+
+  openChatbot() {
+    this.router.navigate(['/chatbot']);
   }
 
   logout() {
