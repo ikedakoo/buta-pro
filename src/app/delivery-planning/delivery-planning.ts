@@ -34,6 +34,8 @@ export class DeliveryPlanningComponent implements OnInit, AfterViewInit, OnDestr
   selectedWarehouse: Warehouse | null = null;
   deliveryPoints: DeliveryPoint[] = [];
   isAreaDivided = false;
+  selectedAreaForDetails: number | null = null;
+  selectedDeliveryPoint: string | null = null;
   
   warehouses: Warehouse[] = [
     { id: 'matsudo', name: '松戸倉庫', location: '千葉', lat: 35.7873, lng: 139.9025 },
@@ -100,6 +102,7 @@ export class DeliveryPlanningComponent implements OnInit, AfterViewInit, OnDestr
   onWarehouseSelect(warehouse: Warehouse) {
     this.selectedWarehouse = warehouse;
     this.isAreaDivided = false;
+    this.selectedAreaForDetails = null;
     this.generateDeliveryPoints(warehouse);
     this.updateMap();
   }
@@ -285,6 +288,122 @@ export class DeliveryPlanningComponent implements OnInit, AfterViewInit, OnDestr
 
   getAreaCount(areaNumber: number): number {
     return this.deliveryPoints.filter(point => point.area === areaNumber).length;
+  }
+
+  toggleAreaDetails(areaNumber: number) {
+    console.log('toggleAreaDetails called with area:', areaNumber);
+    console.log('Current selectedAreaForDetails:', this.selectedAreaForDetails);
+    console.log('isAreaDivided:', this.isAreaDivided);
+    
+    if (this.selectedAreaForDetails === areaNumber) {
+      this.selectedAreaForDetails = null;
+      console.log('Area details closed');
+    } else {
+      this.selectedAreaForDetails = areaNumber;
+      console.log('Area details opened for area:', areaNumber);
+    }
+    
+    console.log('New selectedAreaForDetails:', this.selectedAreaForDetails);
+  }
+
+  getAreaDeliveryPoints(areaNumber: number): DeliveryPoint[] {
+    const points = this.deliveryPoints.filter(point => point.area === areaNumber);
+    console.log(`getAreaDeliveryPoints for area ${areaNumber}:`, points);
+    console.log('Total delivery points:', this.deliveryPoints.length);
+    console.log('Points with area assigned:', this.deliveryPoints.filter(p => p.area).length);
+    return points;
+  }
+
+  onDeliveryPointClick(deliveryPoint: DeliveryPoint) {
+    console.log('Delivery point clicked:', deliveryPoint);
+    
+    // 前の選択を解除
+    const previousSelectedId = this.selectedDeliveryPoint;
+    
+    // 選択状態を切り替え
+    if (this.selectedDeliveryPoint === deliveryPoint.id) {
+      this.selectedDeliveryPoint = null;
+    } else {
+      this.selectedDeliveryPoint = deliveryPoint.id;
+    }
+    
+    // 前の選択があった場合、そのハイライトを解除
+    if (previousSelectedId && previousSelectedId !== deliveryPoint.id) {
+      const previousPoint = this.deliveryPoints.find(p => p.id === previousSelectedId);
+      if (previousPoint) {
+        this.resetMarkerStyle(previousPoint);
+      }
+    }
+    
+    // 地図上のマーカーをハイライト
+    this.highlightMarkerOnMap(deliveryPoint);
+  }
+
+  private async highlightMarkerOnMap(deliveryPoint: DeliveryPoint) {
+    if (!this.map || !isPlatformBrowser(this.platformId)) return;
+
+    try {
+      const leafletModule = await import('leaflet');
+      const L = leafletModule.default || leafletModule;
+
+      // 該当するマーカーを見つけてハイライト
+      const pointIndex = this.deliveryPoints.findIndex(p => p.id === deliveryPoint.id);
+      if (pointIndex !== -1 && this.deliveryMarkers[pointIndex]) {
+        const marker = this.deliveryMarkers[pointIndex];
+        
+        if (this.selectedDeliveryPoint === deliveryPoint.id) {
+          // ハイライト表示
+          marker.setStyle({
+            color: '#ffff00',
+            fillColor: '#ffff00',
+            fillOpacity: 1,
+            radius: 10,
+            weight: 3
+          });
+          
+          // 地図の中心をマーカーに移動
+          this.map.setView([deliveryPoint.lat, deliveryPoint.lng], Math.max(this.map.getZoom(), 12));
+          
+          // ポップアップを開く
+          marker.openPopup();
+        } else {
+          // 通常表示に戻す
+          const originalColor = deliveryPoint.color || '#666666';
+          marker.setStyle({
+            color: originalColor,
+            fillColor: originalColor,
+            fillOpacity: 0.8,
+            radius: 5,
+            weight: 1
+          });
+        }
+      }
+    } catch (error) {
+      console.error('マーカーのハイライトに失敗しました:', error);
+    }
+  }
+
+  private async resetMarkerStyle(deliveryPoint: DeliveryPoint) {
+    if (!this.map || !isPlatformBrowser(this.platformId)) return;
+
+    try {
+      // 該当するマーカーを見つけて通常表示に戻す
+      const pointIndex = this.deliveryPoints.findIndex(p => p.id === deliveryPoint.id);
+      if (pointIndex !== -1 && this.deliveryMarkers[pointIndex]) {
+        const marker = this.deliveryMarkers[pointIndex];
+        const originalColor = deliveryPoint.color || '#666666';
+        
+        marker.setStyle({
+          color: originalColor,
+          fillColor: originalColor,
+          fillOpacity: 0.8,
+          radius: 5,
+          weight: 1
+        });
+      }
+    } catch (error) {
+      console.error('マーカーのリセットに失敗しました:', error);
+    }
   }
 
   private showMapError() {

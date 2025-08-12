@@ -29,7 +29,7 @@
       <div class="action-panel" *ngIf="selectedWarehouse">
         <div class="delivery-info">
           <span class="info-text">
-            <strong>{{selectedWarehouse?.name}}</strong> - 配送予定: {{deliveryPoints.length}}件
+            <strong>{{selectedWarehouse.name}}</strong> - 配送予定: {{deliveryPoints.length}}件
           </span>
         </div>
         <button 
@@ -49,29 +49,60 @@
       <div class="legend" *ngIf="isAreaDivided">
         <h3>配送エリア分割結果</h3>
         <div class="legend-items">
-          <div class="legend-item">
+          <div class="legend-item" (click)="toggleAreaDetails(1)" [class.active]="selectedAreaForDetails === 1">
             <div class="legend-color" style="background-color: #4caf50;"></div>
             <span>エリア1 ({{getAreaCount(1)}}件)</span>
+            <span class="details-btn">{{selectedAreaForDetails === 1 ? '▼' : '▶'}}</span>
           </div>
-          <div class="legend-item">
+          <div class="legend-item" (click)="toggleAreaDetails(2)" [class.active]="selectedAreaForDetails === 2">
             <div class="legend-color" style="background-color: #2196f3;"></div>
             <span>エリア2 ({{getAreaCount(2)}}件)</span>
+            <span class="details-btn">{{selectedAreaForDetails === 2 ? '▼' : '▶'}}</span>
           </div>
-          <div class="legend-item">
+          <div class="legend-item" (click)="toggleAreaDetails(3)" [class.active]="selectedAreaForDetails === 3">
             <div class="legend-color" style="background-color: #ff9800;"></div>
             <span>エリア3 ({{getAreaCount(3)}}件)</span>
+            <span class="details-btn">{{selectedAreaForDetails === 3 ? '▼' : '▶'}}</span>
           </div>
-          <div class="legend-item">
+          <div class="legend-item" (click)="toggleAreaDetails(4)" [class.active]="selectedAreaForDetails === 4">
             <div class="legend-color" style="background-color: #9c27b0;"></div>
             <span>エリア4 ({{getAreaCount(4)}}件)</span>
+            <span class="details-btn">{{selectedAreaForDetails === 4 ? '▼' : '▶'}}</span>
           </div>
-          <div class="legend-item">
+          <div class="legend-item" (click)="toggleAreaDetails(5)" [class.active]="selectedAreaForDetails === 5">
             <div class="legend-color" style="background-color: #f44336;"></div>
             <span>エリア5 ({{getAreaCount(5)}}件)</span>
+            <span class="details-btn">{{selectedAreaForDetails === 5 ? '▼' : '▶'}}</span>
           </div>
         </div>
+        
+        <div class="area-details" *ngIf="selectedAreaForDetails">
+          <h4>エリア{{selectedAreaForDetails}} 配送明細</h4>
+          <div class="details-list">
+            <div class="detail-item" 
+                 *ngFor="let point of getAreaDeliveryPoints(selectedAreaForDetails)"
+                 (click)="onDeliveryPointClick(point)"
+                 [class.selected]="selectedDeliveryPoint === point.id">
+              <div class="detail-header">
+                <span class="customer-name">{{point.customerName}}</span>
+                <span class="delivery-id">ID: {{point.id}}</span>
+              </div>
+              <div class="detail-info">
+                <span class="address">{{point.address}}</span>
+                <span class="coordinates">緯度: {{point.lat.toFixed(4)}}, 経度: {{point.lng.toFixed(4)}}</span>
+              </div>
+              <div class="click-indicator" *ngIf="selectedDeliveryPoint === point.id">
+                📍 地図上でハイライト中
+              </div>
+            </div>
+          </div>
+          <div class="details-note">
+            <p>※ 配送明細をクリックすると地図上のポイントがハイライトされます</p>
+          </div>
+        </div>
+        
         <div class="legend-note">
-          <p>※ 各エリアをドライバーに割り振ることができます</p>
+          <p>※ 各エリアをクリックすると配送明細が表示されます</p>
         </div>
       </div>
       
