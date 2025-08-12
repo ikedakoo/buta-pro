@@ -77,6 +77,110 @@
 .system-content {
   padding: 20px;
   min-height: calc(100vh - 150px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.control-panel {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.warehouse-selection h3 {
+  color: #ffffff;
+  margin: 0 0 15px 0;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.warehouse-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.warehouse-btn {
+  background: #3a3a3a;
+  border: 2px solid #555;
+  border-radius: 10px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #ffffff;
+}
+
+.warehouse-btn:hover {
+  background: #4a4a4a;
+  border-color: #4caf50;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+}
+
+.warehouse-btn.selected {
+  background: linear-gradient(135deg, #4caf50 0%, #2196f3 100%);
+  border-color: #4caf50;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.warehouse-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.warehouse-name {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.warehouse-location {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.action-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 20px;
+  border-top: 1px solid #555;
+}
+
+.delivery-info {
+  color: #e0e0e0;
+}
+
+.info-text {
+  font-size: 16px;
+}
+
+.divide-btn {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.divide-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #f57c00 0%, #e65100 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+}
+
+.divide-btn:disabled {
+  background: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .map-container {
@@ -144,6 +248,63 @@
   height: 16px;
   border-radius: 50%;
   flex-shrink: 0;
+}
+
+.legend-note {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #555;
+}
+
+.legend-note p {
+  color: #aaa;
+  font-size: 12px;
+  margin: 0;
+  font-style: italic;
+}
+
+.instruction {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  background: #1a1a1a;
+  border: 2px solid #444;
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+.instruction-content {
+  text-align: center;
+  color: #ffffff;
+  max-width: 400px;
+}
+
+.instruction-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.instruction-content h3 {
+  color: #ffffff;
+  margin: 0 0 15px 0;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.instruction-content p {
+  color: #cccccc;
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.warehouse-icon {
+  background: transparent !important;
+  border: none !important;
+  text-align: center;
+  line-height: 30px;
+  font-size: 20px;
 }
 
 /* レスポンシブデザイン */

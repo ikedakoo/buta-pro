@@ -9,35 +9,77 @@
   </header>
   
   <div class="system-content">
+    <div class="control-panel">
+      <div class="warehouse-selection">
+        <h3>倉庫選択</h3>
+        <div class="warehouse-buttons">
+          <button 
+            *ngFor="let warehouse of warehouses" 
+            (click)="onWarehouseSelect(warehouse)"
+            [class.selected]="selectedWarehouse && selectedWarehouse.id === warehouse.id"
+            class="warehouse-btn">
+            <div class="warehouse-info">
+              <span class="warehouse-name">{{warehouse.name}}</span>
+              <span class="warehouse-location">{{warehouse.location}}</span>
+            </div>
+          </button>
+        </div>
+      </div>
+      
+      <div class="action-panel" *ngIf="selectedWarehouse">
+        <div class="delivery-info">
+          <span class="info-text">
+            <strong>{{selectedWarehouse?.name}}</strong> - 配送予定: {{deliveryPoints.length}}件
+          </span>
+        </div>
+        <button 
+          (click)="divideIntoAreas()" 
+          [disabled]="deliveryPoints.length === 0 || isAreaDivided"
+          class="divide-btn">
+          {{isAreaDivided ? 'エリア分割済み' : 'エリア分割実行'}}
+        </button>
+      </div>
+    </div>
+
     <div class="map-container">
-      <h2>関東エリア配送計画</h2>
       <div class="map-wrapper">
         <div id="map" class="leaflet-map"></div>
       </div>
       
-      <div class="legend">
-        <h3>エリア別配送ポイント</h3>
+      <div class="legend" *ngIf="isAreaDivided">
+        <h3>配送エリア分割結果</h3>
         <div class="legend-items">
           <div class="legend-item">
             <div class="legend-color" style="background-color: #4caf50;"></div>
-            <span>東京・千葉南部エリア (12ポイント)</span>
+            <span>エリア1 ({{getAreaCount(1)}}件)</span>
           </div>
           <div class="legend-item">
             <div class="legend-color" style="background-color: #2196f3;"></div>
-            <span>神奈川エリア (12ポイント)</span>
+            <span>エリア2 ({{getAreaCount(2)}}件)</span>
           </div>
           <div class="legend-item">
             <div class="legend-color" style="background-color: #ff9800;"></div>
-            <span>埼玉エリア (14ポイント)</span>
+            <span>エリア3 ({{getAreaCount(3)}}件)</span>
           </div>
           <div class="legend-item">
             <div class="legend-color" style="background-color: #9c27b0;"></div>
-            <span>千葉北部・茨城南部エリア (13ポイント)</span>
+            <span>エリア4 ({{getAreaCount(4)}}件)</span>
           </div>
           <div class="legend-item">
             <div class="legend-color" style="background-color: #f44336;"></div>
-            <span>群馬・栃木エリア (12ポイント)</span>
+            <span>エリア5 ({{getAreaCount(5)}}件)</span>
           </div>
+        </div>
+        <div class="legend-note">
+          <p>※ 各エリアをドライバーに割り振ることができます</p>
+        </div>
+      </div>
+      
+      <div class="instruction" *ngIf="!selectedWarehouse">
+        <div class="instruction-content">
+          <div class="instruction-icon">🏢</div>
+          <h3>倉庫を選択してください</h3>
+          <p>上記から倉庫を選択すると、その日の配送予定地点が表示されます。</p>
         </div>
       </div>
     </div>
