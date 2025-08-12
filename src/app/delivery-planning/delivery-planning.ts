@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, Inject, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 interface Warehouse {
   id: string;
@@ -18,11 +19,18 @@ interface DeliveryPoint {
   customerName: string;
   area?: number;
   color?: string;
+  assignedDriver?: string;
+}
+
+interface Driver {
+  id: string;
+  name: string;
+  vehicleNumber: string;
 }
 
 @Component({
   selector: 'app-delivery-planning',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './delivery-planning.html',
   styleUrl: './delivery-planning.css'
 })
@@ -36,6 +44,18 @@ export class DeliveryPlanningComponent implements OnInit, AfterViewInit, OnDestr
   isAreaDivided = false;
   selectedAreaForDetails: number | null = null;
   selectedDeliveryPoint: string | null = null;
+  hasChanges = false;
+  
+  drivers: Driver[] = [
+    { id: 'driver1', name: '田中太郎', vehicleNumber: '車両001' },
+    { id: 'driver2', name: '佐藤次郎', vehicleNumber: '車両002' },
+    { id: 'driver3', name: '山田三郎', vehicleNumber: '車両003' },
+    { id: 'driver4', name: '鈴木四郎', vehicleNumber: '車両004' },
+    { id: 'driver5', name: '高橋五郎', vehicleNumber: '車両005' },
+    { id: 'driver6', name: '渡辺六郎', vehicleNumber: '車両006' },
+    { id: 'driver7', name: '伊藤七郎', vehicleNumber: '車両007' },
+    { id: 'driver8', name: '中村八郎', vehicleNumber: '車両008' }
+  ];
   
   warehouses: Warehouse[] = [
     { id: 'matsudo', name: '松戸倉庫', location: '千葉', lat: 35.7873, lng: 139.9025 },
@@ -127,14 +147,25 @@ export class DeliveryPlanningComponent implements OnInit, AfterViewInit, OnDestr
       
       const customerName = baseNames[i % baseNames.length] + (Math.floor(i / baseNames.length) + 1);
       
+      // 初期段階でもドライバーを割り当て（10件ずつ5人のドライバーに分散）
+      const driverIndex = Math.floor(i / 10) % 5; // 0-4の範囲でドライバーを選択
+      const assignedDriver = this.drivers[driverIndex];
+      
       this.deliveryPoints.push({
         id: `delivery_${i + 1}`,
         lat: lat,
         lng: lng,
         address: `配送先${i + 1}`,
-        customerName: customerName
+        customerName: customerName,
+        assignedDriver: assignedDriver.id
       });
     }
+    
+    console.log('Initial driver assignment completed:', this.deliveryPoints.map(p => ({
+      id: p.id,
+      assignedDriver: p.assignedDriver,
+      driverName: this.getDriverName(p.assignedDriver || '')
+    })));
   }
 
   private async updateMap() {
@@ -224,8 +255,53 @@ export class DeliveryPlanningComponent implements OnInit, AfterViewInit, OnDestr
       point.color = this.areaColors[clusters[index]];
     });
 
+    // エリアごとにドライバーを割り当て（1人あたり最大5件、エリアをまたがない）
+    const availableDrivers = [...this.drivers]; // 全ドライバーを使用可能
+    let globalDriverIndex = 0;
+    
+    for (let areaNum = 1; areaNum <= 5; areaNum++) {
+      const areaPoints = this.deliveryPoints.filter(point => point.area === areaNum);
+      console.log(`Area ${areaNum} has ${areaPoints.length} points`);
+      
+      let currentDriverAssignmentCount = 0;
+      let currentDriverId = availableDrivers[globalDriverIndex].id;
+      
+      areaPoints.forEach((point, pointIndex) => {
+        // 現在のドライバーが5件に達したら次のドライバーに切り替え
+        if (currentDriverAssignmentCount >= 5) {
+          globalDriverIndex++;
+          if (globalDriverIndex >= availableDrivers.length) {
+            globalDriverIndex = 0; // ドライバーが足りない場合は最初に戻る（通常は発生しない）
+          }
+          currentDriverId = availableDrivers[globalDriverIndex].id;
+          currentDriverAssignmentCount = 0;
+        }
+        
+        point.assignedDriver = currentDriverId;
+        currentDriverAssignmentCount++;
+        
+        console.log(`Point ${point.id} in area ${areaNum} assigned to driver ${this.getDriverName(currentDriverId)} (${currentDriverAssignmentCount}/5)`);
+      });
+      
+      // エリアが終わったら次のドライバーに移る（エリアをまたがないため）
+      if (areaPoints.length > 0) {
+        globalDriverIndex++;
+        if (globalDriverIndex >= availableDrivers.length) {
+          globalDriverIndex = 0;
+        }
+      }
+    }
+
     this.isAreaDivided = true;
+    this.hasChanges = false;
     this.updateMap();
+    
+    console.log('Area division completed. All points:', this.deliveryPoints.map(p => ({
+      id: p.id,
+      area: p.area,
+      assignedDriver: p.assignedDriver,
+      driverName: this.getDriverName(p.assignedDriver || '')
+    })));
   }
 
   private kMeansClustering(points: number[][], k: number): number[] {
@@ -404,6 +480,33 @@ export class DeliveryPlanningComponent implements OnInit, AfterViewInit, OnDestr
     } catch (error) {
       console.error('マーカーのリセットに失敗しました:', error);
     }
+  }
+
+  onDriverChange(deliveryPointId: string, driverId: string) {
+    const point = this.deliveryPoints.find(p => p.id === deliveryPointId);
+    if (point) {
+      point.assignedDriver = driverId;
+      this.hasChanges = true;
+      console.log(`Driver changed for ${deliveryPointId} to ${driverId}`);
+    }
+  }
+
+  applyChanges() {
+    if (!this.hasChanges) return;
+    
+    console.log('Applying driver assignment changes...');
+    // ここで実際のAPIコールやデータベース更新を行う
+    // 今回はシミュレーション
+    setTimeout(() => {
+      this.hasChanges = false;
+      console.log('Changes applied successfully');
+      alert('ドライバー割り振りの変更が反映されました。');
+    }, 500);
+  }
+
+  getDriverName(driverId: string): string {
+    const driver = this.drivers.find(d => d.id === driverId);
+    return driver ? driver.name : '未割り当て';
   }
 
   private showMapError() {
